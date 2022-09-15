@@ -72,17 +72,21 @@ try:
         publ(message)
 
     def group(message):
-        global idfp
-        idfp = message.text
-        markup_inline = types.InlineKeyboardMarkup(row_width=1)
-        item_group1 = types.InlineKeyboardButton("Physics. ITMO. 2022. Mechanics", callback_data='group1')
-        item_test= types.InlineKeyboardButton("Test Group", callback_data='grouptest')
-        item_here = types.InlineKeyboardButton("Опубликовать тут", callback_data='here')
-        item_newgroup = types.InlineKeyboardButton("Новая группа", callback_data='groupnew')
+        if message.text != "Отмена" and message.text != "отмена":
+            global idfp
+            idfp = message.text
+            markup_inline = types.InlineKeyboardMarkup(row_width=1)
+            item_group1 = types.InlineKeyboardButton("Physics. ITMO. 2022. Mechanics", callback_data='group1')
+            item_test= types.InlineKeyboardButton("Test Group", callback_data='grouptest')
+            item_here = types.InlineKeyboardButton("Опубликовать тут", callback_data='here')
+            item_newgroup = types.InlineKeyboardButton("Новая группа", callback_data='groupnew')
 
-        markup_inline.add(item_group1, item_test, item_here, item_newgroup)
+            markup_inline.add(item_group1, item_test, item_here, item_newgroup)
 
-        bot.send_message(message.chat.id, 'Выберите место публикации...', reply_markup=markup_inline)
+            bot.send_message(message.chat.id, 'Выберите место публикации...', reply_markup=markup_inline)
+        else:
+            bot.send_message(message.chat.id, "Вы отменили действие", parse_mode='html')
+
     @bot.callback_query_handler(func=lambda call: True)
     def callback(call):
         if call.message:
@@ -283,46 +287,62 @@ try:
 
     def ans3done(message):
         global nv
-        ans3 = message.text
-        if (ans3[0] == 'a' and ans3[1] == 'n' and ans3[2]=='s'):
-            nv.append('NULL')
-            nv.append('NULL')
-            nv.append('NULL')
-            nv.append('NULL')
-            nv.append('NULL')
-            nv.append('NULL')
-            nv.append('NULL')
-            nv.append('NULL')
-            nv.append(ans3)
-            mes5 = bot.send_message(message.chat.id,"Правильный ответ успешно добавлен. Хотите ли вы добавить какое-то описание к опросу?",parse_mode='html')
-            bot.register_next_step_handler(mes5, adddef)
+        if message.text != "Отмена" and message.text != "отмена":
+            ans3 = message.text
+            if (ans3[0] == 'a' and ans3[1] == 'n' and ans3[2]=='s'):
+                nv.append('NULL')
+                nv.append('NULL')
+                nv.append('NULL')
+                nv.append('NULL')
+                nv.append('NULL')
+                nv.append('NULL')
+                nv.append('NULL')
+                nv.append('NULL')
+                nv.append(ans3)
+                mes5 = bot.send_message(message.chat.id,"Правильный ответ успешно добавлен. Хотите ли вы добавить какое-то описание к опросу?",parse_mode='html')
+                bot.register_next_step_handler(mes5, adddef)
+            else:
+                nv.append(ans3)
+                bot.send_message(message.chat.id, "Вы можете добавить ещё один вариант ответ ", parse_mode='html')
+                mes5 = bot.send_message(message.chat.id, "Если считаете, что уже достаточно, то введите 'ans1' без ковычек, где вместо 1 - номер правильного ответа:", parse_mode='html')
+                bot.register_next_step_handler(mes5, ans4done)
         else:
-            nv.append(ans3)
-            bot.send_message(message.chat.id, "Вы можете добавить ещё один вариант ответ ", parse_mode='html')
-            mes5 = bot.send_message(message.chat.id, "Если считаете, что уже достаточно, то введите 'ans1' без ковычек, где вместо 1 - номер правильного ответа:", parse_mode='html')
-            bot.register_next_step_handler(mes5, ans4done)
+            bot.send_message(message.chat.id, "Вы отменили действие", parse_mode='html')
+            nv = []
 
     def ans2done(message):
         global nv
-        ans2 = message.text
-        nv.append(ans2)
-        bot.send_message(message.chat.id, "Вы можете добавить ещё один вариант ответ ", parse_mode='html')
-        mes4 = bot.send_message(message.chat.id,"Если считаете, что уже достаточно, то введите 'ans1' без ковычек, где вместо 1 - номер правильного ответа:",parse_mode='html')
-        bot.register_next_step_handler(mes4, ans3done)
+        if message.text != "Отмена" and message.text != "отмена":
+            ans2 = message.text
+            nv.append(ans2)
+            bot.send_message(message.chat.id, "Вы можете добавить ещё один вариант ответ ", parse_mode='html')
+            mes4 = bot.send_message(message.chat.id,"Если считаете, что уже достаточно, то введите 'ans1' без ковычек, где вместо 1 - номер правильного ответа:",parse_mode='html')
+            bot.register_next_step_handler(mes4, ans3done)
+        else:
+            bot.send_message(message.chat.id, "Вы отменили действие", parse_mode='html')
+            nv = []
 
     def ans1done(message):
         global nv
-        ans1 = message.text
-        nv.append(ans1)
-        mes3 = bot.send_message(message.chat.id, "Для создания опроса необходимо добавить ещё хотя бы 1 вариант:", parse_mode='html')
-        bot.register_next_step_handler(mes3, ans2done)
+        if message.text != "Отмена" and message.text != "отмена":
+            ans1 = message.text
+            nv.append(ans1)
+            mes3 = bot.send_message(message.chat.id, "Для создания опроса необходимо добавить ещё хотя бы 1 вариант:", parse_mode='html')
+            bot.register_next_step_handler(mes3, ans2done)
+        else:
+            bot.send_message(message.chat.id, "Вы отменили действие", parse_mode='html')
+            nv = []
 
     def questdone(message):
         global nv
-        quest = message.text
-        nv.append(quest)
-        mes2 = bot.send_message(message.chat.id, "Теперь введите первый вариант ответа на ваш вопрос:", parse_mode='html')
-        bot.register_next_step_handler(mes2, ans1done)
+        if message.text != "Отмена" and message.text != "отмена":
+            quest = message.text
+            nv.append(quest)
+            mes2 = bot.send_message(message.chat.id, "Теперь введите первый вариант ответа на ваш вопрос:", parse_mode='html')
+            bot.register_next_step_handler(mes2, ans1done)
+        else:
+            bot.send_message(message.chat.id, "Вы отменили действие", parse_mode='html')
+            nv = []
 
 
     def newvote(message):
