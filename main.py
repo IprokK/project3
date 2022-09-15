@@ -1,9 +1,13 @@
 import pymysql
 import pymysql.cursors
 import telebot
+from telebot import types
 from config import host, user, password, db_name
 #подключение к БД
 nv = []
+tv = []
+chat = 0
+idfp = 0
 try:
     connection = pymysql.connect(
         host=host,
@@ -21,7 +25,6 @@ try:
     @bot.message_handler(commands=['start'])
 
     def start(message):
-        print(message)
         bot.send_message(message.chat.id, '<b>Доброго времени суток, '+''+'. Чего желаете?</b>', parse_mode='html')
 
     def adddef(message):
@@ -44,12 +47,59 @@ try:
         bot.send_message(message.chat.id, 'Отлично, ваш опрос успешно создан. Номер опроса для публикации: <b>'+str(x)+'</b>', parse_mode='html')
         nv = []
 
-        # connection.commit()
+    def group1(message):
+        global chat
+        chat = -1777413552
+        publ(message)
+
+    def groupnew(message):
+        nmes = bot.send_message(message.chat.id, "Хорошо, введите номер id группы...", parse_mode='html')
+        bot.register_next_step_handler(nmes, addnewgroup)
+
+    def addnewgroup(message):
+        global chat
+        chat = int(message.text)
+        publ(message)
+
+    def grouptest(message):
+        global chat
+        chat = -773955573
+        publ(message)
+
+    def here(message):
+        global chat
+        chat = message.chat.id
+        publ(message)
+
+    def group(message):
+        global idfp
+        idfp = message.text
+        markup_inline = types.InlineKeyboardMarkup(row_width=1)
+        item_group1 = types.InlineKeyboardButton("Physics. ITMO. 2022. Mechanics", callback_data='group1')
+        item_test= types.InlineKeyboardButton("Test Group", callback_data='grouptest')
+        item_here = types.InlineKeyboardButton("Опубликовать тут", callback_data='here')
+        item_newgroup = types.InlineKeyboardButton("Новая группа", callback_data='groupnew')
+
+        markup_inline.add(item_group1, item_test, item_here, item_newgroup)
+
+        bot.send_message(message.chat.id, 'Выберите место публикации...', reply_markup=markup_inline)
+    @bot.callback_query_handler(func=lambda call: True)
+    def callback(call):
+        if call.message:
+            if call.data == "group1":
+                group1(call.message)
+            elif call.data == "grouptest":
+                grouptest(call.message)
+            elif call.data == "here":
+                here(call.message)
+            elif call.data == "groupnew":
+                groupnew(call.message)
+
 
     def publ(message):
-        id = (message.text)
+        global idfp
         with connection.cursor() as cursor:
-            id = cursor.execute("SELECT `question`, `ans1`, `ans2`, `ans3`, `ans4`, `ans5`, `ans6`, `ans7`, `ans8`, `ans9`, `ans10`, `rightans`, `descr` FROM `votes` WHERE id = %s",(id))
+            id = cursor.execute("SELECT `question`, `ans1`, `ans2`, `ans3`, `ans4`, `ans5`, `ans6`, `ans7`, `ans8`, `ans9`, `ans10`, `rightans`, `descr` FROM `votes` WHERE id = %s",(idfp))
             ids = cursor.fetchall()
             if ids != ():
                 connection.commit()
@@ -61,7 +111,7 @@ try:
                 for aa in dd:
                     if aa != 'NULL': anslist.append(aa)
 
-                bot.send_poll(message.chat.id, quest, anslist, False, 'quiz', None, rightans, descr )
+                bot.send_poll(chat, quest, anslist, False, 'quiz', None, rightans, descr )
             else:
                 nmes = bot.send_message(message.chat.id, "Такого номера не существует, введите корректный",
                                         parse_mode='html')
@@ -271,7 +321,6 @@ try:
 
 
     def newvote(message):
-        nv = []
         mes = bot.send_message(message.chat.id, "Для создания опроса введите вопрос", parse_mode='html')
         bot.register_next_step_handler(mes, questdone)
 
@@ -281,15 +330,14 @@ try:
         if message.text == "Опрос" or message.text == 'опрос'or message.text == 'ОПРОС':
             newvote(message)
 
-            #with connection.cursor() as cursor:
-                #a = "INSERT INTO votes (question, ans1, ans2, rightans) VALUES (quest, ans1, 'Нет', 'ans1')"
-                #c = cursor.execute(a)
-                #print(c)
 
-                #connection.commit()
         if message.text == "Опубликовать" or message.text == "опубликовать":
-            nmes = bot.send_message(message.chat.id, "Для публикации опроса введите его номер...", parse_mode='html')
-            bot.register_next_step_handler(nmes, publ)
+            #nmes = bot.send_message(message.chat.id, "Хотите опубликовать опрос сейчас?", parse_mode='html')
+            nmes = bot.send_message(message.chat.id, "Хорошо, введите номер опроса...", parse_mode='html')
+            bot.register_next_step_handler(nmes, group)
+            #bot.register_next_step_handler(nmes, prepubl)
+        else:
+            bot.send_message(message.chat.id, "Я вас не понимаю...", parse_mode='html')
 
     bot.polling(none_stop=True)
 except Exception as ex:
