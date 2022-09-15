@@ -98,13 +98,18 @@ try:
 
     def publ(message):
         global idfp
+        global chat
+        print(len(message.text))
+        if len(message.text) <=4:
+            idfp = int(message.text)
+            print(idfp)
         with connection.cursor() as cursor:
             id = cursor.execute("SELECT `question`, `ans1`, `ans2`, `ans3`, `ans4`, `ans5`, `ans6`, `ans7`, `ans8`, `ans9`, `ans10`, `rightans`, `descr` FROM `votes` WHERE id = %s",(idfp))
             ids = cursor.fetchall()
             if ids != ():
                 connection.commit()
                 quest = ids[0]['question']
-                rightans = ids[0]['rightans'][-1]
+                rightans = int(ids[0]['rightans'][-1])-1
                 descr = ids[0]['descr']
                 dd = [ids[0]['ans1'], ids[0]['ans2'], ids[0]['ans3'], ids[0]['ans4'], ids[0]['ans5'], ids[0]['ans6'], ids[0]['ans7'], ids[0]['ans8'], ids[0]['ans9'], ids[0]['ans10']]
                 anslist = []
@@ -329,9 +334,7 @@ try:
     def getusermessage(message):
         if message.text == "Опрос" or message.text == 'опрос'or message.text == 'ОПРОС':
             newvote(message)
-
-
-        if message.text == "Опубликовать" or message.text == "опубликовать":
+        elif message.text == "Опубликовать" or message.text == "опубликовать":
             #nmes = bot.send_message(message.chat.id, "Хотите опубликовать опрос сейчас?", parse_mode='html')
             nmes = bot.send_message(message.chat.id, "Хорошо, введите номер опроса...", parse_mode='html')
             bot.register_next_step_handler(nmes, group)
