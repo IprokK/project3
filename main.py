@@ -50,7 +50,7 @@ try:
 
     def group1(message):
         global chat
-        chat = -1777413552
+        chat = -1001738481240
         publ(message)
 
     def groupnew(message):
@@ -104,10 +104,8 @@ try:
     def publ(message):
         global idfp
         global chat
-        print(len(message.text))
         if len(message.text) <=4:
             idfp = int(message.text)
-            print(idfp)
         with connection.cursor() as cursor:
             id = cursor.execute("SELECT `question`, `ans1`, `ans2`, `ans3`, `ans4`, `ans5`, `ans6`, `ans7`, `ans8`, `ans9`, `ans10`, `rightans`, `descr` FROM `votes` WHERE id = %s",(idfp))
             ids = cursor.fetchall()
@@ -351,9 +349,6 @@ try:
         bot.register_next_step_handler(mes, questdone)
 
 
-    @bot.message_handler(func=lambda message: message.chat.id not in adm)
-    def some(message):
-        bot.send_message(message.chat.id, "Sorry you are not in Whitelist")
 
 
     @bot.message_handler(func=lambda message: message.chat.id in adm)
@@ -365,8 +360,9 @@ try:
             nmes = bot.send_message(message.chat.id, "Хорошо, введите номер опроса...", parse_mode='html')
             bot.register_next_step_handler(nmes, group)
             #bot.register_next_step_handler(nmes, prepubl)
-        else:
-            bot.send_message(message.chat.id, "Я вас не понимаю...", parse_mode='html')
+
+
+
 
     bot.polling(none_stop=True)
 except Exception as ex:
