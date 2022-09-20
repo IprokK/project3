@@ -8,6 +8,7 @@ nv = []
 tv = []
 chat = 0
 idfp = 0
+adm = [132969936, 960361521]
 try:
     connection = pymysql.connect(
         host=host,
@@ -22,7 +23,7 @@ try:
 
     bot = telebot.TeleBot("5372505442:AAEkCpHCkK59SpotKYpUVFdzQ2W2xh8fNOM")
 
-    @bot.message_handler(commands=['start'])
+    @bot.message_handler(commands=['start'], func=lambda message: message.chat.id in adm)
 
     def start(message):
         bot.send_message(message.chat.id, '<b>Доброго времени суток, '+''+'. Чего желаете?</b>', parse_mode='html')
@@ -350,7 +351,12 @@ try:
         bot.register_next_step_handler(mes, questdone)
 
 
-    @bot.message_handler()
+    @bot.message_handler(func=lambda message: message.chat.id not in adm)
+    def some(message):
+        bot.send_message(message.chat.id, "Sorry you are not in Whitelist")
+
+
+    @bot.message_handler(func=lambda message: message.chat.id in adm)
     def getusermessage(message):
         if message.text == "Опрос" or message.text == 'опрос'or message.text == 'ОПРОС':
             newvote(message)
