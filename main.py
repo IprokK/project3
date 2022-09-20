@@ -363,7 +363,6 @@ try:
 
 
 
-
     bot.polling(none_stop=True)
 except Exception as ex:
     print("Connection refused...")
