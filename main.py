@@ -8,7 +8,6 @@ nv = []
 tv = []
 chat = 0
 idfp = 0
-adm = [132969936, 960361521]
 try:
     connection = pymysql.connect(
         host=host,
@@ -19,7 +18,6 @@ try:
     )
     print("successfully connected...")
     print(" " * 20)
-    # запуск кода
 
     bot = telebot.TeleBot("5372505442:AAEkCpHCkK59SpotKYpUVFdzQ2W2xh8fNOM")
 
@@ -348,20 +346,85 @@ try:
         mes = bot.send_message(message.chat.id, "Для создания опроса введите вопрос", parse_mode='html')
         bot.register_next_step_handler(mes, questdone)
 
+    def addrating(mes):
+        print(mes)
+        print(mes.text)
+        print(type(mes.text))
+        surname = mes.text.split()[1]
+        name = mes.text.split()[2]
+        if name[-1] == ",":
+            name = name[:-1]
 
 
+        with connection.cursor() as cursor:
+            rate = cursor.execute("SELECT rating FROM rating WHERE surname = %s and name = %s",(surname, name))
+            rates = cursor.fetchall()
+            if rates != ():
+                cursor.execute(
+                    "UPDATE rating SET rating = rating + 1 WHERE surname = %s and name = %s", (surname, name))
+                connection.commit()
+            else:
+                cursor.execute(
+                    "INSERT INTO rating (surname, name, rating) VALUES (%s, %s, 1)", (surname, name))
+                connection.commit()
 
-    @bot.message_handler(func=lambda message: message.chat.id in adm)
+        with connection.cursor() as cursor:
+            rate = cursor.execute("SELECT rating FROM rating WHERE surname = %s and name = %s",(surname, name))
+            rates = cursor.fetchall()
+            check = rates[0]['rating']
+        bot.send_message(mes.chat.id, ("Вы добавили пользователю "+ surname +" "+ name +" 1 балл. Итого общий балл: " +str(check)))
+        print("Админ добавил пользователю "+ surname +" "+ name +" 1 балл. Итого общий балл: " +str(check))
+
+    def delrating(mes):
+        surname = mes.text.split()[1]
+        name = mes.text.split()[2]
+        if name[-1] == ",":
+            name = name[:-1]
+
+        with connection.cursor() as cursor:
+            rate = cursor.execute("SELECT rating FROM rating WHERE surname = %s and name = %s", (surname, name))
+            rates = cursor.fetchall()
+            if rates != ():
+                cursor.execute(
+                    "UPDATE rating SET rating = rating - 1 WHERE surname = %s and name = %s", (surname, name))
+                connection.commit()
+                check = rates[0]['rating']-1
+                bot.send_message(mes.chat.id, ("Вы сняли пользователю " + surname + " " + name + " 1 балл. Итого общий балл: " + str(check)))
+                print("Админ снял пользователю " + surname + " " + name + " 1 балл. Итого общий балл: " + str(check))
+            else:
+                bot.send_message(mes.chat.id, "Ошибка! У пользователя и так нет баллов.")
+
+    def rating(mes):
+        with connection.cursor() as cursor:
+            mov = []
+            rate = cursor.execute("SELECT * FROM rating ")
+            rates = cursor.fetchall()
+            for i in rates:
+                mov.append(str(i["surname"]) +" "+ str(i["name"]) +" "+ str(i["rating"]))
+            bot.send_message(mes.chat.id, '\n'.join(mov))
+
+
+    @bot.message_handler()
     def getusermessage(message):
         if message.text == "Опрос" or message.text == 'опрос'or message.text == 'ОПРОС':
-            newvote(message)
+            if message.from_user.id == 132969936 or message.from_user.id == 960361521:
+                newvote(message)
         elif message.text == "Опубликовать" or message.text == "опубликовать":
-            #nmes = bot.send_message(message.chat.id, "Хотите опубликовать опрос сейчас?", parse_mode='html')
-            nmes = bot.send_message(message.chat.id, "Хорошо, введите номер опроса...", parse_mode='html')
-            bot.register_next_step_handler(nmes, group)
-            #bot.register_next_step_handler(nmes, prepubl)
-
-
+            if message.from_user.id == 132969936 or message.from_user.id == 960361521:
+                nmes = bot.send_message(message.chat.id, "Хорошо, введите номер опроса...", parse_mode='html')
+                bot.register_next_step_handler(nmes, group)
+        elif message.text == "+":
+            if message.from_user.id == 132969936 or message.from_user.id == 960361521:
+                addrating(message.reply_to_message)
+        elif message.text == "-":
+            if message.from_user.id == 132969936 or message.from_user.id == 960361521:
+                bot.send_message(message.chat.id, "Ошибка не была засчитана!")
+        elif message.text == "--":
+            if message.from_user.id == 132969936 or message.from_user.id == 960361521:
+                delrating(message.reply_to_message)
+        elif message.text == "рейтинг":
+            if message.from_user.id == 132969936 or message.from_user.id == 960361521:
+                rating(message)
 
     bot.polling(none_stop=True)
 except Exception as ex:
