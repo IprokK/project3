@@ -18,12 +18,12 @@ connection = pymysql.connect(
 print("successfully connected...")
 print(" " * 20)
 
-bot = telebot.TeleBot("5734720458:AAFtu2kCNLjet6k_JXm9hX0f6GIJ2ErR7D0")
+bot = telebot.TeleBot("API_Key")
 
 @bot.message_handler(commands=['start'])
 
 def start(message):
-    if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+    if message.from_user.id == 000000 or message.from_user.id == 000000:
         bot.send_message(message.chat.id, '<b>Доброго времени суток, '+''+'. Чего желаете?</b>', parse_mode='html')
 
 def adddef(message):
