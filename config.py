@@ -1,4 +1,4 @@
-host = "149.202.88.119"
-user = 'gs170632'
-password = 'rRkzwv60IYgG'
-db_name = 'gs170632'
+host = "000"
+user = '000'
+password = '000'
+db_name = '000'
