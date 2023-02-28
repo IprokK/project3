@@ -446,7 +446,7 @@ def vresults(mes):
 #002уточнение:
 """
 Писать боту могут только те пользователи, которые прошли условие:
-if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+if message.from_user.id == 000 or message.from_user.id == 000:
 Оно проверяет не id чата, а именно id человека, который отправил сообщение, таким образом,
 Условие работает и в общих чатах. Это условие прописано к каждой команде, так что для того, 
 чтобы дать доступ к определённой команде для всех, достаточно просто убрать эту страку и убрать 1 табуляцию 
@@ -458,29 +458,29 @@ if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
 @bot.message_handler()
 def getusermessage(message):
     if message.text == "Опрос" or message.text == 'опрос'or message.text == 'ОПРОС':
-        if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+        if message.from_user.id == 000 or message.from_user.id == 000:
             newvote(message)
     elif message.text == "Опубликовать" or message.text == "опубликовать":
-        if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+        if message.from_user.id == 000 or message.from_user.id == 000:
             nmes = bot.send_message(message.chat.id, "Хорошо, введите номер опроса...", parse_mode='html')
             bot.register_next_step_handler(nmes, group)
     elif message.text == "+":
-        if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+        if message.from_user.id == 000 or message.from_user.id == 000:
             addrating(message.reply_to_message)
     elif message.text == "-":
-        if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+        if message.from_user.id == 000 or message.from_user.id == 000:
             bot.send_message(message.chat.id, "Ошибка не была засчитана!")
     elif message.text == "--":
-        if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+        if message.from_user.id == 000 or message.from_user.id == 000:
             delrating(message.reply_to_message)
     elif message.text == "рейтинг" or message.text == "Рейтинг" or message.text == "РЕЙТИНГ":
-        if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+        if message.from_user.id == 000 or message.from_user.id == 000:
             rating(message)
     elif message.text.split()[0] == "Установить" or message.text.split()[0] == "установить" or message.text.split()[0] == "Set":
-        if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+        if message.from_user.id == 000 or message.from_user.id == 000:
             setnew(message)
     elif message.text == "результаты" or message.text == "Результаты" or message.text == "РЕЗУЛЬТАТЫ":
-        if message.from_user.id == 132969936 or message.from_user.id == 5663898672:
+        if message.from_user.id == 000 or message.from_user.id == 000:
             vresults(message)
 
 
